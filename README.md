@@ -1,4 +1,4 @@
 # PPYH
 practice GIT
 
-my name is jeongsu 
+my name is jeongsu 1
