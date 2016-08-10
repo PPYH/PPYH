@@ -1,0 +1,91 @@
+--sql 1번 문제--
+
+select e.사원번호, e.이름,e.sumsal,d.DEPARTMENT_NAME 부서명, j.JOB_TITLE 업무
+from (select salary+nvl(salary*COMMISSION_PCT,0) sumsal, FIRST_NAME||' '||LAST_NAME 이름,
+             EMPLOYEE_ID 사원번호, SALARY 급여,JOB_ID,DEPARTMENT_ID
+      from EMPLOYEES
+      order by sumsal desc) e,JOBS j, DEPARTMENTS d
+where e.DEPARTMENT_ID=d.DEPARTMENT_ID and j.JOB_ID=e.JOB_ID and rownum<=6;
+
+--2번 문제--
+
+
+select js.JOB_ID 업무코드,to_char(js.sumsal,'$999,999') 급여합,d.JOB_TITLE 업무명
+from(select JOB_ID, sum(SALARY) sumsal
+        from EMPLOYEES
+        group by JOB_ID
+        having sum(SALARY)>5000
+        order by sumsal desc) js, JOBS d
+ where d.JOB_ID=js.JOB_ID and d.JOB_TITLE !='SALESMAN' and rownum<=10;     
+        
+        
+--3번 문제--
+
+
+
+select e.EMPLOYEE_ID 사원번호, e.FIRST_NAME||' '||e.LAST_NAME 이름,
+        e.SALARY 급여, ae.avgsal 평균급여,ae.DEPARTMENT_ID 부서번호
+from (select trunc(avg(SALARY)) avgsal ,DEPARTMENT_ID
+        from EMPLOYEES
+        group by DEPARTMENT_ID) ae, EMPLOYEES e
+where e.SALARY>(select trunc(avg(SALARY)) avgsal
+                from EMPLOYEES
+                where DEPARTMENT_ID=e.DEPARTMENT_ID
+                group by DEPARTMENT_ID )
+     and e.DEPARTMENT_ID=ae.DEPARTMENT_ID and rownum<10
+order by e.SALARY desc;      
+
+
+--4번 문제
+
+
+select e.EMPLOYEE_ID 사원번호, e.FIRST_NAME 이름 , mcnt.cnt 부하직원수
+from (select MANAGER_ID, count(EMPLOYEE_ID) cnt
+        from EMPLOYEES
+        group by MANAGER_ID
+        having count(EMPLOYEE_ID)>=7) mcnt, EMPLOYEES e
+where e.EMPLOYEE_ID=mcnt.MANAGER_ID;
+
+
+-- 5번 문제
+
+
+select e.EMPLOYEE_ID 사원번호, e.FIRST_NAME 이름,e.hire_date 입사날짜,e.SALARY 급여,workyear 근속년수,DEPARTMENT_NAME 부서명
+from (select trunc(MONTHS_BETWEEN(sysdate,HIRE_DATE)/12) workyear, EMPLOYEE_ID
+       from EMPLOYEES
+       order by workyear desc) eyear , EMPLOYEES e,DEPARTMENTS d
+where eyear.EMPLOYEE_ID=e.EMPLOYEE_ID and d.DEPARTMENT_ID=e.DEPARTMENT_ID and rownum<=5;
+
+--6번 문제
+
+select e.EMPLOYEE_ID 사원번호, e.FIRST_NAME 이름, e.JOB_ID 업무코드,
+        d.DEPARTMENT_ID 부서번호, d.DEPARTMENT_NAME 부서명,
+        to_char(jh.START_DATE,'YYYY-MM-DD') 시작날짜, to_char(jh.END_DATE,'YYYY-MM-DD') 종료날짜
+from EMPLOYEES e , JOB_HISTORY jh,DEPARTMENTS d
+where d.DEPARTMENT_ID=e.DEPARTMENT_ID
+    and e.EMPLOYEE_ID=jh.EMPLOYEE_ID(+)
+    order by e.EMPLOYEE_ID;
+    
+    
+--7번 문제
+
+
+create or replace view num7 as select EMPLOYEE_ID 사원번호,FIRST_NAME 이름,JOB_ID 업무코드,dd.*
+from EMPLOYEES ee,
+    (select d.DEPARTMENT_NAME 부서명, d.DEPARTMENT_ID 부서코드,
+       l.city 도시,c.COUNTRY_NAME 국가명,r.REGION_NAME 대륙명
+        from DEPARTMENTS d,LOCATIONS l,REGIONS r,COUNTRIES c  
+        where l.location_id=d.location_id and c.REGION_ID=r.REGION_ID
+                and c.COUNTRY_ID=l.COUNTRY_ID 
+       ) dd
+where dd.부서코드=ee.DEPARTMENT_ID
+order by 사원번호;
+
+select 대륙명,count(*) cnt
+from num7
+group by 대륙명
+order by cnt desc;
+
+
+
+
