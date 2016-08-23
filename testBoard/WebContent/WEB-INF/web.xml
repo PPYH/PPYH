@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>JAVAEEPrj</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+ 
+	<filter>
+		<filter-name>Encodingfilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>Encodingfilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+  
+  <!-- needed for ContextLoaderListener 
+  전체 모든 jsp가 공유한다 ContextLoaderListene가 읽어감. -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:/spring/config/beans.xml</param-value>
+	</context-param>
+
+	<!-- Bootstraps the root web application context before servlet initialization 
+		기존에 작성했던 xml을 웹컨테이어너에게 알려줌.
+		웹 컨테이너가 위치를 읽어서 파싱할 수 있도록-->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- 기존 서블릿의 역할. 모든 요청을 처리.. 해당 JSP로 포워딩
+		모든 요청을 받는 프론트 컨트롤러
+	 -->
+  
+  <!-- 
+  contextConfigLocation 이건 servlet만 인지하는 parameter
+  The front controller of this Spring Web application, responsible for handling all application requests -->
+	<servlet>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:/spring/config/beans.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+<!-- url에 어떤 문자열이 나타나면 springDispatcherServlet를 부르는지 설정.-->
+	<!-- Map all requests to the DispatcherServlet for handling -->
+	<servlet-mapping>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+  
+  <error-page>
+  	<error-code>500</error-code>
+  	<location>/errorInfo.jsp</location>
+  </error-page>
+  
+      <session-config>
+        <session-timeout>20</session-timeout>
+    </session-config>
+  
+  
+  
+</web-app>

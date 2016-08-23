@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardNS">
+
+<select id="selectComment" parameterType="Integer"   resultType="Comment">
+	select id,name,CONTENT ccomment,password,wdate
+	from comment_board
+	where bnum=#{value}
+</select>
+
+	<sql id="selectitem" >
+		select id,name,content,password,wdate,subject
+		from board
+	</sql>
+
+	<select id="allList" resultType="Board">
+		<include refid="selectitem" />
+		order by
+		wdate desc
+	</select>
+
+	<select id="selectByID" resultType="Board" parameterType="Integer">
+		<include refid="selectitem" />
+		where id=#{value}
+		order by
+		wdate
+	</select>
+
+	<select id="selectPass" resultType="String" parameterType="Integer">
+		select password
+		from board
+		where id=#{value}
+	</select>
+
+	<update id="updateitem" parameterType="Board">
+		update board
+		set
+		content=#{content},
+		password=#{password},
+		subject=#{subject}
+		where id=#{id}
+	</update>
+
+	<insert id="insertComment"  parameterType="Comment">
+		insert into COMMENT_BOARD 
+		values(commentcnt.NEXTVAL,#{ccomment},#{password},#{name},sysdate,#{bnum})
+	</insert>
+
+	<delete id="deleteitem" parameterType="Integer">
+		delete from board
+		where
+		id=#{value}
+	</delete>
+	
+	<insert id="insertitem" parameterType="Board">
+		insert into board values(boardcnt.NEXTVAL,#{name},#{content},#{password},sysdate,#{subject})
+	</insert>
+	
+	
+
+</mapper>
